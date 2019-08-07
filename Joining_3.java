@@ -5,8 +5,16 @@
  */
 
 package package_1;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 /**
  *
  * @author hp
@@ -21,20 +29,70 @@ public class Joining_3 extends javax.swing.JFrame {
      * Creates new form Joining_3
      * @return
      */
-    public ArrayList<Integer> getcomplaints(){
-        ArrayList<Integer> list=new ArrayList<>();
-        System.out.println(id);
+    public ArrayList<Pair> getcomplaints(){
+        ArrayList<Pair> list=new ArrayList<>();
+        
+        try {
+            Connection con=DriverManager.getConnection("jdbc:mysql:///help_helper","root","");
+            if(con!=null){
+                ArrayList<Integer> customer_list=new ArrayList<>();
+                String str="Select customer_id from complaints where Service_Person_Id=?";
+                PreparedStatement ps=con.prepareStatement(str);
+                ps.setInt(1,id);
+                ResultSet rs=ps.executeQuery();
+                while(rs.next()){
+                    customer_list.add(rs.getInt(1));
+                }
+                for(int i=0;i<customer_list.size();i++){
+                  str="Select First_name,Mobile,Address,Service,Complaint_Status from customer_data natural join complaints where complaints.customer_id=?";
+                  ps=con.prepareStatement(str);
+                  ps.setInt(1,customer_list.get(i));
+                  rs=ps.executeQuery();
+                  while(rs.next()){
+                      Pair q=new Pair(rs.getString(1),rs.getString(2),rs.getString(3),rs.getString(4),rs.getString(5));
+                      list.add(q);
+                  }
+                }
+                
+            }
+            else{
+                System.out.println("Connection NOt Estabilished");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Joining_3.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+        
+        
+        
         return list;
+    }
+    
+    public void show_user(){
+        ArrayList<Pair> list=getcomplaints();
+        DefaultTableModel tab=(DefaultTableModel) table1.getModel();
+        Object row[]=new Object[5];
+        for(int i=0;i<list.size();i++){
+            row[0]=list.get(i).name;
+            row[1]=list.get(i).mobile;
+            row[2]=list.get(i).address;
+            row[3]=list.get(i).service;
+            row[4]=list.get(i).status;
+            tab.addRow(row);
+        }
+        
     }
     //
     public Joining_3(){
         initComponents();
-        System.out.println(id);
+//        ArrayList<Pair> x=getcomplaints();
+        
     }
     public Joining_3(int x) {
         id=x;
-        
         initComponents();
+        show_user();
     }
 
     /**
@@ -53,7 +111,7 @@ public class Joining_3 extends javax.swing.JFrame {
         jRadioButton2 = new javax.swing.JRadioButton();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        table1 = new javax.swing.JTable();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jButton2 = new javax.swing.JButton();
@@ -92,7 +150,7 @@ public class Joining_3 extends javax.swing.JFrame {
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
         jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 3));
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        table1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null},
                 {null, null, null, null, null},
@@ -103,7 +161,7 @@ public class Joining_3 extends javax.swing.JFrame {
                 "Customer Name", "Mobile Number", "Address", "Service", "Complaint Status"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(table1);
 
         jLabel3.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         jLabel3.setText("LIST OF CUSTOMERS ");
@@ -238,6 +296,6 @@ public class Joining_3 extends javax.swing.JFrame {
     private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable table1;
     // End of variables declaration//GEN-END:variables
 }
