@@ -10,15 +10,18 @@ package package_1;
  *
  * @author hp
  */
-public class Pair {
-    String name,mobile,address,service,status;
-    int id;
-    public Pair(String name,String mobile,String address,String service,String status,int id){
+class Employee {
+    
+    int id,aadhar;
+    String name,mobile,service,status,address;
+    
+    Employee(int id,int aadhar,String name,String mobile,String service,String address,String status){
+        this.id=id;
+        this.aadhar=aadhar;
         this.name=name;
-        this.address=address;
         this.mobile=mobile;
+        this.address=address;
         this.service=service;
         this.status=status;
-        this.id=id;
     }
 }

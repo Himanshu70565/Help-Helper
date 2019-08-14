@@ -48,7 +48,7 @@ public class Joining_2 extends javax.swing.JFrame {
 
         jCheckBox1.setText("jCheckBox1");
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -144,11 +144,12 @@ public class Joining_2 extends javax.swing.JFrame {
                 ps.setString(2,pass);
                 ResultSet rs=ps.executeQuery();
                 if(rs.next()){
-                    super.dispose();
+                    
                     new Joining_3(x).setVisible(true);
                 }
                 else{
                     JOptionPane.showMessageDialog(this,"WRONG AADAHAR ID OR PASSWORD");
+                    
                 }
               }else{
                 System.out.println("CONNECTION NOT ESTABILISHED");

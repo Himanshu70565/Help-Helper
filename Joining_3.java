@@ -21,6 +21,7 @@ import javax.swing.table.DefaultTableModel;
  */
 public class Joining_3 extends javax.swing.JFrame {
     private int id;
+    private int id_real;
     /**
      * Creates new form Joining_3
      */
@@ -30,6 +31,7 @@ public class Joining_3 extends javax.swing.JFrame {
      * @return
      */
     public ArrayList<Pair> getcomplaints(){
+        System.out.println("Hello Complaints");
         ArrayList<Pair> list=new ArrayList<>();
         
         try {
@@ -38,18 +40,20 @@ public class Joining_3 extends javax.swing.JFrame {
                 ArrayList<Integer> customer_list=new ArrayList<>();
                 String str="Select customer_id from complaints where Service_Person_Id=?";
                 PreparedStatement ps=con.prepareStatement(str);
-                ps.setInt(1,id);
+                ps.setInt(1,id_real);
                 ResultSet rs=ps.executeQuery();
                 while(rs.next()){
+ 
                     customer_list.add(rs.getInt(1));
                 }
+                System.out.println(customer_list.size());
                 for(int i=0;i<customer_list.size();i++){
-                  str="Select First_name,Mobile,Address,Service,Complaint_Status from customer_data natural join complaints where complaints.customer_id=?";
+                  str="Select First_name,Mobile,Address,Service,Status,Customer_id from customer_data natural join complaints where complaints.customer_id=?";
                   ps=con.prepareStatement(str);
                   ps.setInt(1,customer_list.get(i));
                   rs=ps.executeQuery();
                   while(rs.next()){
-                      Pair q=new Pair(rs.getString(1),rs.getString(2),rs.getString(3),rs.getString(4),rs.getString(5));
+                      Pair q=new Pair(rs.getString(1),rs.getString(2),rs.getString(3),rs.getString(4),rs.getString(5),rs.getInt(6));
                       list.add(q);
                   }
                 }
@@ -72,26 +76,89 @@ public class Joining_3 extends javax.swing.JFrame {
     public void show_user(){
         ArrayList<Pair> list=getcomplaints();
         DefaultTableModel tab=(DefaultTableModel) table1.getModel();
-        Object row[]=new Object[5];
+        Object row[]=new Object[6];
         for(int i=0;i<list.size();i++){
             row[0]=list.get(i).name;
             row[1]=list.get(i).mobile;
             row[2]=list.get(i).address;
             row[3]=list.get(i).service;
             row[4]=list.get(i).status;
+            row[5]=list.get(i).id;
             tab.addRow(row);
         }
         
     }
-    //
-    public Joining_3(){
-        initComponents();
-//        ArrayList<Pair> x=getcomplaints();
+    
+    public boolean see_status(int x){
+        String query="";
         
+        try {
+            Connection con =DriverManager.getConnection("jdbc:mysql:///help_helper","root","");
+            if(con!=null){
+                
+                String str="Select Status,Employee_id from Employee_data where Aadhar_NUmber=?";
+                PreparedStatement ps=con.prepareStatement(str);
+                ps.setInt(1,x);
+               
+                
+                ResultSet rs=ps.executeQuery();
+                while(rs.next()){
+                    query=rs.getString(1);
+                    this.id_real=rs.getInt(2);
+                    
+                }
+               
+            }
+            else{
+                System.out.println("Connection Cant be made");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Joining_3.class.getName()).log(Level.SEVERE, null, ex);
+        }
+              
+               return query.equals("Available");  
+        
+      
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+//    public Joining_3(){
+//       
+//        initComponents();
+//        boolean ans=see_status(102);
+//        if(ans==true){
+//            jRadioButton1.setSelected(true);
+//        }
+//        else{
+//            jRadioButton2.setSelected(true);
+//        }
+//       
+////        ArrayList<Pair> x=getcomplaints();
+//        
+//    }
     public Joining_3(int x) {
-        id=x;
+        
+        this.id=x;
         initComponents();
+        boolean ans=see_status(x);
+        if(ans==true){
+            jRadioButton1.setSelected(true);
+        }
+        else{
+            jRadioButton2.setSelected(true);
+        }
         show_user();
     }
 
@@ -104,6 +171,7 @@ public class Joining_3 extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -117,7 +185,7 @@ public class Joining_3 extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -143,8 +211,15 @@ public class Joining_3 extends javax.swing.JFrame {
 
         jLabel2.setText("Choose your Status for Now");
 
+        buttonGroup1.add(jRadioButton1);
         jRadioButton1.setText("Available ");
+        jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton1ActionPerformed(evt);
+            }
+        });
 
+        buttonGroup1.add(jRadioButton2);
         jRadioButton2.setText("Not Available");
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
@@ -152,13 +227,10 @@ public class Joining_3 extends javax.swing.JFrame {
 
         table1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
+
             },
             new String [] {
-                "Customer Name", "Mobile Number", "Address", "Service", "Complaint Status"
+                "Customer Name", "Mobile Number", "Address", "Service", "Complaint Status", "Customer_id"
             }
         ));
         jScrollPane1.setViewportView(table1);
@@ -169,6 +241,11 @@ public class Joining_3 extends javax.swing.JFrame {
         jLabel4.setText("CLICK HERE TO CHANGE THE STATUS OF THE COMPLAINT THAT YOU HAVE RESOLVED");
 
         jButton2.setText("NEXT");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -202,7 +279,12 @@ public class Joining_3 extends javax.swing.JFrame {
                 .addGap(45, 45, 45))
         );
 
-        jButton1.setText("CHANGE");
+        jButton1.setText("UPDATE");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -249,6 +331,48 @@ public class Joining_3 extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jRadioButton1ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        String result="";
+        if(jRadioButton1.isSelected()){
+            result="Available";
+        }else
+            result="Not Available";
+        
+        try {
+            Connection con =DriverManager.getConnection("jdbc:mysql:///help_helper","root","");
+            if(con!=null){
+                String str="update Employee_data set Status=? where Aadhar_Number=?";
+                PreparedStatement ps=con.prepareStatement(str);
+                ps.setString(1,result);
+                ps.setInt(2,this.id);
+                int row=ps.executeUpdate();
+               if(row>0){
+                   JOptionPane.showMessageDialog(this,"Updated");
+               }
+               
+            }
+            else{
+                System.out.println("Connection Cant be made");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Joining_3.class.getName()).log(Level.SEVERE, null, ex);
+        }        
+       
+        
+        
+        
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        new Page15(id).setVisible(true);
+        super.dispose();
+        
+    }//GEN-LAST:event_jButton2ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -285,6 +409,7 @@ public class Joining_3 extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;

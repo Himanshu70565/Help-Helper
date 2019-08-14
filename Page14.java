@@ -9,6 +9,7 @@ package package_1;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -95,10 +96,15 @@ public class Page14 extends javax.swing.JInternalFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         int x=Integer.parseInt(txt_1.getText());
         int y=Integer.parseInt(txt_2.getText());
+        boolean ans=checkExist(y);
+        System.out.println(ans);
+        if(ans==false){
+           return;
+        }else{
         try {
             Connection con =DriverManager.getConnection("jdbc:mysql:///help_helper","root","");
             if(con!=null){
@@ -123,9 +129,42 @@ public class Page14 extends javax.swing.JInternalFrame {
         catch(SQLException ex){
             System.out.println(ex.toString());
         }
-        
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    public boolean checkExist(int y){
+        String status="";
+        try {
+            Connection con=DriverManager.getConnection("jdbc:mysql:///help_helper","root","");
+            if(con!=null){
+                String str="select Status from employee_data where employee_id=?";
+                PreparedStatement ps=con.prepareStatement(str);
+                ps.setInt(1,y);
+                ResultSet rs=ps.executeQuery();
+                if(rs.next()){
+                    status=rs.getString(1);
+                    if(status.equals("Available")){
+                        return true;
+                    }
+                    else{
+                        JOptionPane.showMessageDialog(this,"This Employee is Not Available at this moment");
+                    }
+                }
+                else{
+                    JOptionPane.showMessageDialog(this,"NO SUCH EMPLOYEE ");
+                    
+                }
+                        
+            }
+            else{
+                System.out.println("Connection has not been made");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(Page14.class.getName()).log(Level.SEVERE, null, ex);
+        }
+       return false; 
+    }
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;

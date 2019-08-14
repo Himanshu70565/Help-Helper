@@ -255,6 +255,18 @@ int count=0;
        mobile=txt_3.getText();
         email=txt_4.getText();
          pass=String.valueOf(txt_5.getPassword());
+         if(first.equals("First Name")){
+             JOptionPane.showMessageDialog(this,"Enter the details properly");
+             return;
+         }
+         if (last.equals("Last Name")){
+             JOptionPane.showMessageDialog(this,"Enter the details properly");
+             return;
+            }
+         if(email.equals("Email")){
+             JOptionPane.showMessageDialog(this,"Enter the details properly");
+             return;
+         }
          
         try {
             Connection con=(Connection) DriverManager.getConnection("jdbc:mysql:///help_helper","root","");
@@ -285,8 +297,9 @@ int count=0;
                         int a=rs.getInt(1);
                         JOptionPane.showMessageDialog(this,"Your Customer_Id is "+a+" . Remember it for future Reference ." );
                         super.dispose();
+                        new Customer_Complaints(a).setVisible(true);
                     }
-                    new Customer_Complaints().setVisible(true);
+                    
                 }
               }
             }else

@@ -24,8 +24,9 @@ public class Customer_Complaints extends javax.swing.JFrame {
     /**
      * Creates new form Customer_Complaints
      */
-    public Customer_Complaints() {
+    public Customer_Complaints(int a) {
         initComponents();
+        txt_1.setText(String.valueOf(a));
     }
 
     /**
@@ -86,6 +87,7 @@ public class Customer_Complaints extends javax.swing.JFrame {
 
         jLabel2.setText("Enter your Customer_Id");
 
+        txt_1.setEditable(false);
         txt_1.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 txt_1KeyTyped(evt);
